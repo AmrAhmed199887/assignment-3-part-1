@@ -11,7 +11,7 @@ then
 	if [ -d $filesdir ]
 	then
 
-	echo "The number of files are `ls $filesdir | wc -l` and the number of matching lines are `cat ${filesdir}/* |grep "$searchstr" |wc -l`"
+	echo "The number of files are `ls $filesdir | wc -l` and the number of matching lines are `for f in ${filesdir}/* ; do cat "${f}";echo ;done |grep "$searchstr" |wc -l`"
 
 	else
 	echo 'no such directory'
