@@ -1,5 +1,11 @@
-#include "systemcalls.h"
 
+#include <stdlib.h>
+#include <unistd.h>
+#include "systemcalls.h"
+#include <sys/types.h>
+#include <sys/stat.h> 
+#include <fcntl.h>
+#include <sys/wait.h>
 /**
  * @param cmd the command to execute with system()
  * @return true if the command in @param cmd was executed
@@ -17,7 +23,34 @@ bool do_system(const char *cmd)
  *   or false() if it returned a failure
 */
 
-    return true;
+int ret;
+ret= system(cmd);
+if(WIFEXITED(ret))
+{
+	printf("Normal termination with exit status=%d\n",WEXITSTATUS (ret));
+	return true;
+}
+if(WIFSIGNALED (ret))
+{
+	printf ("Killed by signal=%d%s\n",WTERMSIG (ret),WCOREDUMP (ret) ? " (dumped core)" : "");
+	return false;
+}
+if (WIFSTOPPED (ret)) 
+{ 
+	printf ("Stopped by signal=%d\n",WSTOPSIG (ret)); 
+	return false;
+}
+if (WIFCONTINUED (ret)) 
+ printf ("Continued\n");
+
+if(ret == -1)
+{
+	printf("something wronge happened\n");
+	return false;
+}
+
+printf("undefined termination\n");
+    return false;
 }
 
 /**
@@ -58,10 +91,75 @@ bool do_exec(int count, ...)
  *   as second argument to the execv() command.
  *
 */
+int status,ret;
+pid_t pid;
+bool check=false;
+fflush(stdout);
+pid= fork();
+if(pid == -1)
+{
+	printf("can't fork the process");
+        
+	check=false;
+}
+else if(pid ==0)
+{
+	ret=execv(command[0],command+1);
+	if(ret == -1)
+	{
+	perror("cant execv the command\n");
+        // check=false;
+	exit(EXIT_FAILURE);
+	}
+        
+}
+else if (pid >0)
+{
+        pid=wait(&status);
+        printf("pid = %d\n",pid);
+if(WIFEXITED(status))
+{
+        printf("Normal termination with exit status=%d\n",WEXITSTATUS (status));
+        if(WEXITSTATUS (status)==EXIT_FAILURE)
+        {
+                check = false;
+        }
+        else if(EXIT_SUCCESS== WEXITSTATUS (status))
+        {
+                check = true;
+        }
+}
+if(WIFSIGNALED (status))
+{
+        printf ("Killed by signal=%d%s\n",WTERMSIG (status),WCOREDUMP (status) ? " (dumped core)" : "");
+        if(WEXITSTATUS (status)==EXIT_FAILURE)
+        {
+                check = false;
+        }
+        else if(EXIT_SUCCESS== WEXITSTATUS (status))
+        {
+                check = true;
+        }
+}
+if (WIFSTOPPED (status))
+{
+        printf ("Stopped by signal=%d\n",WSTOPSIG (status));
+        if(WEXITSTATUS (status)==EXIT_FAILURE)
+        {
+                check = false;
+        }
+        else if(EXIT_SUCCESS== WEXITSTATUS (status))
+        {
+                check = true;
+        }
+}
+}
+
+
 
     va_end(args);
 
-    return true;
+    return check;
 }
 
 /**
@@ -93,7 +191,82 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
  *
 */
 
+int status,fd,ret;
+pid_t pid;
+bool check=false;
+
+
+fflush(stdout);
+pid= fork();
+if(pid == -1)
+{
+        perror("can't fork the process");
+        return false;
+}
+else if(pid ==0)
+{
+        fd = open(outputfile,O_RDWR | O_CREAT , 0644);
+        if(fd < 0)
+        {
+        printf("error at open function ");
+        return false;
+        }    
+	if(dup2(fd,1) < 0)
+	{
+	        perror("error at dup2 phase");
+	exit(EXIT_FAILURE);
+	}
+	close(fd);
+        ret=execv(command[0],&command[1]);
+        if(ret == -1)
+        {
+        perror("cant execv the command");
+        exit(EXIT_FAILURE);
+        }
+}
+else
+{
+pid=wait(&status);
+if(WIFEXITED(status))
+{
+        printf("Normal termination with exit status=%d\n",WEXITSTATUS (status));
+        if(WEXITSTATUS (status)==EXIT_FAILURE)
+        {
+                check = false;
+        }
+        else if(EXIT_SUCCESS== WEXITSTATUS (status))
+        {
+                check = true;
+        }
+}
+if(WIFSIGNALED (status))
+{
+        printf ("Killed by signal=%d%s\n",WTERMSIG (status),WCOREDUMP (status) ? " (dumped core)" : "");
+        if(WEXITSTATUS (status)==EXIT_FAILURE)
+        {
+                check = false;
+        }
+        else if(EXIT_SUCCESS== WEXITSTATUS (status))
+        {
+                check = true;
+        }
+}
+if (WIFSTOPPED (status))
+{
+        printf ("Stopped by signal=%d\n",WSTOPSIG (status));
+        if(WEXITSTATUS (status)==EXIT_FAILURE)
+        {
+                check = false;
+        }
+        else if(EXIT_SUCCESS== WEXITSTATUS (status))
+        {
+                check = true;
+        }
+}
+
+}
+
     va_end(args);
 
-    return true;
+    return check;
 }
