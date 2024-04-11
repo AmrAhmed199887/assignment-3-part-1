@@ -104,55 +104,30 @@ if(pid == -1)
 }
 else if(pid ==0)
 {
-	ret=execv(command[0],command+1);
+	ret=execv(command[0],command);
 	if(ret == -1)
 	{
-	perror("cant execv the command\n");
-        // check=false;
-	exit(EXIT_FAILURE);
+	perror( "execvp failed" );
+         exit( 1 );
 	}
         
 }
 else if (pid >0)
 {
-        pid=wait(&status);
+        pid=waitpid(pid,&status,0);
         printf("pid = %d\n",pid);
+        if(pid==-1)
+        {
+                return false;
+        }
+        else
+        {
 if(WIFEXITED(status))
 {
         printf("Normal termination with exit status=%d\n",WEXITSTATUS (status));
-        if(WEXITSTATUS (status)==EXIT_FAILURE)
-        {
-                check = false;
-        }
-        else if(EXIT_SUCCESS== WEXITSTATUS (status))
-        {
-                check = true;
-        }
+        return !(WEXITSTATUS (status));
 }
-if(WIFSIGNALED (status))
-{
-        printf ("Killed by signal=%d%s\n",WTERMSIG (status),WCOREDUMP (status) ? " (dumped core)" : "");
-        if(WEXITSTATUS (status)==EXIT_FAILURE)
-        {
-                check = false;
         }
-        else if(EXIT_SUCCESS== WEXITSTATUS (status))
-        {
-                check = true;
-        }
-}
-if (WIFSTOPPED (status))
-{
-        printf ("Stopped by signal=%d\n",WSTOPSIG (status));
-        if(WEXITSTATUS (status)==EXIT_FAILURE)
-        {
-                check = false;
-        }
-        else if(EXIT_SUCCESS== WEXITSTATUS (status))
-        {
-                check = true;
-        }
-}
 }
 
 
@@ -205,7 +180,7 @@ if(pid == -1)
 }
 else if(pid ==0)
 {
-        fd = open(outputfile,O_RDWR | O_CREAT , 0644);
+        fd = open(outputfile,O_RDWR | O_CREAT | O_TRUNC , 0644);
         if(fd < 0)
         {
         printf("error at open function ");
@@ -217,7 +192,7 @@ else if(pid ==0)
 	exit(EXIT_FAILURE);
 	}
 	close(fd);
-        ret=execv(command[0],&command[1]);
+        ret=execv(command[0],command);
         if(ret == -1)
         {
         perror("cant execv the command");
@@ -230,30 +205,6 @@ pid=wait(&status);
 if(WIFEXITED(status))
 {
         printf("Normal termination with exit status=%d\n",WEXITSTATUS (status));
-        if(WEXITSTATUS (status)==EXIT_FAILURE)
-        {
-                check = false;
-        }
-        else if(EXIT_SUCCESS== WEXITSTATUS (status))
-        {
-                check = true;
-        }
-}
-if(WIFSIGNALED (status))
-{
-        printf ("Killed by signal=%d%s\n",WTERMSIG (status),WCOREDUMP (status) ? " (dumped core)" : "");
-        if(WEXITSTATUS (status)==EXIT_FAILURE)
-        {
-                check = false;
-        }
-        else if(EXIT_SUCCESS== WEXITSTATUS (status))
-        {
-                check = true;
-        }
-}
-if (WIFSTOPPED (status))
-{
-        printf ("Stopped by signal=%d\n",WSTOPSIG (status));
         if(WEXITSTATUS (status)==EXIT_FAILURE)
         {
                 check = false;
