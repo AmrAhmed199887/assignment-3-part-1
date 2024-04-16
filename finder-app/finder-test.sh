@@ -8,7 +8,7 @@ set -u
 NUMFILES=10
 WRITESTR=AELD_IS_FUN
 WRITEDIR=/tmp/aeld-data
-username=$(cat conf/username.txt)
+username=$(cat username.txt)
 
 if [ $# -lt 3 ]
 then
@@ -32,10 +32,10 @@ echo "Writing ${NUMFILES} files containing string ${WRITESTR} to ${WRITEDIR}"
 rm -rf "${WRITEDIR}"
 
 # create $WRITEDIR if not assignment1
-mkdir -p "$WRITEDIR"
-assignment=`cat ../conf/assignment.txt`
+#mkdir -p "$WRITEDIR"
+assignment=`cat assignment.txt`
 
-if [ $assignment != 'assignment1' ]
+if [ "$assignment" != "assignment1" ]
 then
 	mkdir -p "$WRITEDIR"
 
