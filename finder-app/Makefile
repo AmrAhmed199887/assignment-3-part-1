@@ -8,4 +8,4 @@ writer.o: writer.c
 	$(CROSS_COMPILE) -Wall -g -c writer.c
 	#gcc -Wall -g -c writer.c
 clean:
-	rm -r writer *.o
+	rm -rf writer *.o
