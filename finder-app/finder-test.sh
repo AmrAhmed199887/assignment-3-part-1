@@ -16,9 +16,10 @@ then
 	if [ $# -lt 1 ]
 	then
 		echo "Using default value ${NUMFILES} for number of files to write"
+
 	else
 		NUMFILES=$1
-	fi	
+	fi
 else
 	NUMFILES=$1
 	WRITESTR=$2
@@ -55,10 +56,10 @@ fi
 
 for i in $( seq 1 $NUMFILES)
 do
-	./writer "$WRITEDIR/${username}$i.txt" "$WRITESTR"
+	/usr/bin/writer "$WRITEDIR/${username}$i.txt" "$WRITESTR"
 done
 
-OUTPUTSTRING=$(./finder.sh "$WRITEDIR" "$WRITESTR")
+OUTPUTSTRING=$(/usr/bin/finder.sh "$WRITEDIR" "$WRITESTR")
 
 # remove temporary directories
 rm -rf /tmp/aeld-data
