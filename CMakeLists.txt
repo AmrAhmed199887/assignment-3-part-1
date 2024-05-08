@@ -10,7 +10,7 @@ set(CMAKE_C_FLAGS "-pthread")
 set(AUTOTEST_SOURCES
     test/assignment1/Test_hello.c
     test/assignment1/Test_assignment_validate.c
-<<<<<<< HEAD
+#<<<<<<< HEAD
 #<<<<<<< HEAD
 #<<<<<<< HEAD
     ../student-test/assignment1/Test_validate_username.c
@@ -20,16 +20,16 @@ set(AUTOTEST_SOURCES
 #=======
     test/assignment4/Test_threading.c
 #>>>>>>> assignments-base/assignment4
-=======
->>>>>>> assignments-base/assignment5
+#=======
+#>>>>>>> assignments-base/assignment5
 )
 # A list of all files containing test code that is used for assignment validation
 set(TESTED_SOURCE
     ../examples/autotest-validate/autotest-validate.c
-<<<<<<< HEAD
+#<<<<<<< HEAD
     ../examples/systemcalls/systemcalls.c
     ../examples/threading/threading.c
-=======
->>>>>>> assignments-base/assignment5
+#=======
+#>>>>>>> assignments-base/assignment5
 )
 add_subdirectory(assignment-autotest)
